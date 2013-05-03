@@ -1,8 +1,10 @@
 package lab3.sistema;
 
-import lab03.util.ContadorDePalavras;
-import lab03.util.GerenciadorDeResultados;
-import lab03.util.ListadorDeArquivos;
+import javax.swing.JFrame;
+
+import lab03.ui.TelaInicial;
+
+
 
 public class Main {
 
@@ -10,13 +12,11 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ListadorDeArquivos listador = new ListadorDeArquivos("D:/work/Lab03");
-		GerenciadorDeResultados resultado = new GerenciadorDeResultados();
-		for (String string : listador.getListaDeArquivos()) {
-			ContadorDePalavras contador = new ContadorDePalavras(string);
-			resultado.AddResultado(contador.getResultado());
-		}
 		
+		JFrame janela = new  TelaInicial();
+		janela.setVisible(true);
 	}
+
+	
 
 }
