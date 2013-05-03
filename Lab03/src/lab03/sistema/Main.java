@@ -1,4 +1,4 @@
-package lab3.sistema;
+package lab03.sistema;
 
 import javax.swing.JFrame;
 
