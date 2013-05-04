@@ -207,6 +207,8 @@ public class TelaInicial extends javax.swing.JFrame {
 		if (!err) {
 
 		}
+		this.setVisible(false);
+		new TabelaDeResultados(folderPath.getText()).show();
 	}
 
 	private void abrirPastaActionPerformed(java.awt.event.ActionEvent evt) {

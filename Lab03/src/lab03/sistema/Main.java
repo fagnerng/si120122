@@ -14,7 +14,9 @@ public class Main {
 	public static void main(String[] args) {
 		
 		JFrame janela = new  TelaInicial();
-		janela.setVisible(true);
+		janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		
 	}
 
 	
