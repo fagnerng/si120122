@@ -6,6 +6,10 @@ package lab03.ui;
 
 import java.awt.event.ActionEvent;
 
+import lab03.util.ContadorDePalavras;
+import lab03.util.GerenciadorDeResultados;
+import lab03.util.ListadorDeArquivos;
+
 /**
  * 
  * @author Fagner
@@ -15,13 +19,19 @@ public class TelaInicial extends javax.swing.JFrame {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1312068541826905502L;
+	
 
 	/**
 	 * Creates new form TelaInicial
+	 * @param listadorDeArquivos 
 	 */
 	public TelaInicial() {
 		initComponents();
+	}
+	public TelaInicial(ListadorDeArquivos listadorDeArquivos) {
+		initComponents();
+		this.listadeArquivos = listadorDeArquivos;
+		
 	}
 
 	/**
@@ -207,8 +217,23 @@ public class TelaInicial extends javax.swing.JFrame {
 		if (!err) {
 
 		}
-		this.setVisible(false);
-		new TabelaDeResultados(folderPath.getText()).show();
+		this.dispose();
+		listadeArquivos = new ListadorDeArquivos(folderPath.getText());
+		telaResultados = new TabelaDeResultados(listadeArquivos);
+		telaResultados.setVisible(true);
+		Thread tread1 = new Thread(new Runnable() {
+			private GerenciadorDeResultados gerente = new GerenciadorDeResultados();
+			@Override
+			public void run() {
+				for (String string : listadeArquivos.getListaDeArquivos()) {
+					ContadorDePalavras contador = new ContadorDePalavras(string);
+					gerente.AddResultado(contador.getResultado());
+					telaResultados.updateTable(gerente);
+				}
+				
+			}
+		});
+		tread1.start();
 	}
 
 	private void abrirPastaActionPerformed(java.awt.event.ActionEvent evt) {
@@ -264,8 +289,14 @@ public class TelaInicial extends javax.swing.JFrame {
 			}
 		});
 	}
-
+	public TabelaDeResultados getTelaResultados() {
+		return telaResultados;
+	}
 	// Variables declaration - do not modify
+
+	private static final long serialVersionUID = -1312068541826905502L;
+	private ListadorDeArquivos listadeArquivos;
+	private TabelaDeResultados telaResultados;
 	private javax.swing.JButton IniciarPesquisa;
 	private javax.swing.JButton abrirPasta;
 	private javax.swing.JLabel folderPath;
