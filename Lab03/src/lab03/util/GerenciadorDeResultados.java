@@ -8,15 +8,24 @@ public class GerenciadorDeResultados {
 	private Map<String, Integer> resultado;
 	private int totalEncontrado;
 	private int arquivosPesquisados;
-	
+	private int numTotalArquivos;
+	private boolean modificada;
+	private static GerenciadorDeResultados currentInstance;
 
-	public GerenciadorDeResultados() {
+	private GerenciadorDeResultados() {
+
 		resultado = new HashMap<String, Integer>();
 		arquivosPesquisados = 0;
+		numTotalArquivos = 0;
+		modificada = false;
 	}
 
 	public Map<String, Integer> getResultado() {
-		return resultado;
+		synchronized (resultado) {
+
+			modificada = false;
+			return resultado;
+		}
 	}
 
 	public int getArquivosPesquisados() {
@@ -24,26 +33,45 @@ public class GerenciadorDeResultados {
 	}
 
 	public void AddResultado(Map<String, Integer> parcial) {
-		
-		MergeResultado(parcial);
-		arquivosPesquisados++;
-		
+		synchronized (resultado) {
+			MergeResultado(parcial);
+			arquivosPesquisados++;
+			modificada = true;
+		}
 	}
 
+	private void MergeResultado(Map<String, Integer> parcial) {
 
-
-	private synchronized void MergeResultado(Map<String, Integer> parcial) {
 		for (String chave : parcial.keySet()) {
 			if (!resultado.containsKey(chave)) {
 				resultado.put(chave, 0);
 			}
 			resultado.put(chave, resultado.get(chave) + parcial.get(chave));
-			totalEncontrado+= parcial.get(chave);
+			totalEncontrado += parcial.get(chave);
 		}
+
 	}
 
 	public int getTotalEncontrado() {
 		return totalEncontrado;
+	}
+
+	public static GerenciadorDeResultados getCurrentInstance() {
+		if (currentInstance == null)
+			currentInstance = new GerenciadorDeResultados();
+		return currentInstance;
+	}
+
+	public boolean temModificacao() {
+		return modificada;
+	}
+
+	public int getNumTotalArquivos() {
+		return numTotalArquivos;
+	}
+
+	public synchronized void addArquivo() {
+		numTotalArquivos++;
 	}
 
 }

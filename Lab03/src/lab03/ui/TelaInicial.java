@@ -5,10 +5,14 @@
 package lab03.ui;
 
 import java.awt.event.ActionEvent;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import lab03.util.ContadorDePalavras;
-import lab03.util.GerenciadorDeResultados;
-import lab03.util.ListadorDeArquivos;
+import javax.swing.JOptionPane;
+
+import lab03.runnable.Leitor;
 
 /**
  * 
@@ -28,12 +32,7 @@ public class TelaInicial extends javax.swing.JFrame {
 	public TelaInicial() {
 		initComponents();
 	}
-	public TelaInicial(ListadorDeArquivos listadorDeArquivos) {
-		initComponents();
-		this.listadeArquivos = listadorDeArquivos;
-		
-	}
-
+	
 	/**
 	 * This method is called from within the constructor to initialize the form.
 	 * WARNING: Do NOT modify this code. The content of this method is always
@@ -202,38 +201,31 @@ public class TelaInicial extends javax.swing.JFrame {
 	}// </editor-fold>
 
 	protected void IniciarPesquisaActionPerformed(ActionEvent evt) {
-		boolean err = false;
+		String err = "";
 		if (folderPath.getText().equals("Nenhuma pasta Selecionada")) {
-			err = true;
-			System.out.println("Selecione uma Pasta");
-		}
+			err = "Selecione uma Pasta";
+			}
 		try {
-			Integer.parseInt(numThreads.getText());
+			int i = Integer.parseInt(numThreads.getText());
+			if (i <0) err = "Digite um Numero Positivo";
 		} catch (NumberFormatException e) {
-			err = true;
-			System.out.println("Numero Invalido");
+			err = "Numero Invalido";
 			e.hashCode();
 		}
-		if (!err) {
-
+		if (!err.equals("")) {
+			JOptionPane.showMessageDialog(this, err, "Erro", JOptionPane.ERROR_MESSAGE);
 		}
+		else
+		{
 		this.dispose();
-		listadeArquivos = new ListadorDeArquivos(folderPath.getText());
-		telaResultados = new TabelaDeResultados(listadeArquivos);
+		int numMax = Integer.parseInt(numThreads.getText());
+		if (numMax<1) numMax = Integer.MAX_VALUE;
+		ExecutorService executor = new ThreadPoolExecutor(numMax, numMax, 1, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>());
+		executor.execute(new Leitor(executor, folderPath.getText()));
+		telaResultados = new TabelaDeResultados(folderPath.getText());
 		telaResultados.setVisible(true);
-		Thread tread1 = new Thread(new Runnable() {
-			private GerenciadorDeResultados gerente = new GerenciadorDeResultados();
-			@Override
-			public void run() {
-				for (String string : listadeArquivos.getListaDeArquivos()) {
-					ContadorDePalavras contador = new ContadorDePalavras(string);
-					gerente.AddResultado(contador.getResultado());
-					telaResultados.updateTable(gerente);
-				}
-				
-			}
-		});
-		tread1.start();
+		}
+	
 	}
 
 	private void abrirPastaActionPerformed(java.awt.event.ActionEvent evt) {
@@ -295,7 +287,6 @@ public class TelaInicial extends javax.swing.JFrame {
 	// Variables declaration - do not modify
 
 	private static final long serialVersionUID = -1312068541826905502L;
-	private ListadorDeArquivos listadeArquivos;
 	private TabelaDeResultados telaResultados;
 	private javax.swing.JButton IniciarPesquisa;
 	private javax.swing.JButton abrirPasta;
