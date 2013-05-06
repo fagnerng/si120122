@@ -223,6 +223,8 @@ public class TelaInicial extends javax.swing.JFrame {
 		ExecutorService executor = new ThreadPoolExecutor(numMax, numMax, 1, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>());
 		executor.execute(new Leitor(executor, folderPath.getText()));
 		telaResultados = new TabelaDeResultados(folderPath.getText());
+		telaResultados.setSize(800, 600);
+		
 		telaResultados.setVisible(true);
 		}
 	

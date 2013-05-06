@@ -16,7 +16,6 @@ public class TabelaDeResultados extends javax.swing.JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = -1694051409432898226L;
-
 	/**
 	 * Creates new form TabelaDeResultados
 	 */
@@ -27,6 +26,7 @@ public class TabelaDeResultados extends javax.swing.JFrame {
 	public TabelaDeResultados(String filePath) {
 		initComponents();
 		diretorio.setText(filePath);
+		resultado.setEnabled(false);
 		
 	}
 
@@ -38,7 +38,6 @@ public class TabelaDeResultados extends javax.swing.JFrame {
 	// <editor-fold defaultstate="collapsed" desc="Generated Code">
 
 	private void initComponents() {
-
 		jPanel1 = new javax.swing.JPanel();
 		barraDeProgresso = new javax.swing.JProgressBar();
 		barraDeProgresso.setValue(0);
@@ -67,32 +66,33 @@ public class TabelaDeResultados extends javax.swing.JFrame {
 
 		porcentagen.setText("");
 
-		resultado.setModel(new javax.swing.table.DefaultTableModel(
-				new Object[][] {},
-				new String[] { "Palavra Chave", "Frequência" }) {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 7584618057417700327L;
-			@SuppressWarnings("rawtypes")
-			Class[] types = new Class[] { java.lang.String.class,
-					java.lang.Integer.class };
-			boolean[] canEdit = new boolean[] { true, false };
-
-			@SuppressWarnings({ "rawtypes", "unchecked" })
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
-			}
-
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
-			}
-		});
+		resultado.setModel(new TabelaUi());
+//				new javax.swing.table.DefaultTableModel(
+//				new Object[][] {},
+//				new String[] { "Palavra Chave", "Frequência" }) {
+//			/**
+//			 * 
+//			 */
+//			private static final long serialVersionUID = 7584618057417700327L;
+//			@SuppressWarnings("rawtypes")
+//			Class[] types = new Class[] { java.lang.String.class,
+//					java.lang.Integer.class };
+//			boolean[] canEdit = new boolean[] { true, false };
+//
+//			@SuppressWarnings({ "rawtypes", "unchecked" })
+//			public Class getColumnClass(int columnIndex) {
+//				return types[columnIndex];
+//			}
+//
+//			public boolean isCellEditable(int rowIndex, int columnIndex) {
+//				return canEdit[columnIndex];
+//			}
+//		});
 		jScrollPane2.setViewportView(resultado);
 
 		jLabel1.setText("Diretorio:");
 
-		diretorio.setText("c:....");
+		diretorio.setText("");
 
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
 				jPanel1);
@@ -172,7 +172,7 @@ public class TabelaDeResultados extends javax.swing.JFrame {
 										.addComponent(
 												jScrollPane2,
 												javax.swing.GroupLayout.DEFAULT_SIZE,
-												291, Short.MAX_VALUE)
+												391, Short.MAX_VALUE)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 										.addGroup(
@@ -262,46 +262,51 @@ public class TabelaDeResultados extends javax.swing.JFrame {
 		});
 	}
 
-	static public synchronized void updateNumArquivo() {
-		int num = GerenciadorDeResultados.getCurrentInstance().getNumTotalArquivos();
-		String texto = num + " arquivos";
-		switch (num) {
-		case 0:
-			texto = "0 arquivos";
-			break;
-		case 1:
-			texto = "1 arquivo";
-			break;
-		}
+	static public synchronized void  updateNumArquivo() {
+		int num = GerenciadorDeResultados.getCurrentInstance()
+					.getNumTotalArquivos();
+			String texto = num + " arquivos";
+			switch (num) {
+			case 0:
+				texto = "0 arquivos";
+				break;
+			case 1:
+				texto = "1 arquivo";
+				break;
+			}
 
-		numArquivosTotal.setText(texto);
-		barraDeProgresso.setMaximum(num);
+			numArquivosTotal.setText(texto);
+			barraDeProgresso.setMaximum(num);
+		
 	}
 
 	static public synchronized void updateTable() {
-
-		GerenciadorDeResultados gResultado = GerenciadorDeResultados
-				.getCurrentInstance();
-		if (gResultado.temModificacao()) {
-			numArquivosParcial.setText(gResultado.getArquivosPesquisados() + "");
-			encontrados.setText(gResultado.getTotalEncontrado() + "");
-			barraDeProgresso.setValue(gResultado.getArquivosPesquisados());
-			for(String chave: gResultado.getResultado().keySet()){
-				//TODO
-				chave.hashCode();
+			GerenciadorDeResultados gResultado = GerenciadorDeResultados
+					.getCurrentInstance();
+			if (gResultado.temModificacao()) {
+				numArquivosParcial.setText(gResultado.getArquivosPesquisados()
+						+ "");
+				encontrados.setText(gResultado.getTotalEncontrado()
+						+ " palavras chaves em ");
+				numTotal = gResultado.getArquivosPesquisados();
+				barraDeProgresso.setValue(numTotal);
+				numArquivosTotal.setText(numTotal + " arquivos em "
+						+ gResultado.getTempoDecorrido() + " milisegundos");
+				resultado.setModel(new TabelaUi(gResultado.getResultado()));
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		
 
 	}
 
 	// Variables declaration - do not modify
 
+	private static int numTotal = 0;
 	private static javax.swing.JProgressBar barraDeProgresso;
 	private javax.swing.JLabel diretorio;
 	private static javax.swing.JLabel encontrados;

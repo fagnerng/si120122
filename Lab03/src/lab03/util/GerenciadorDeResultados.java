@@ -1,5 +1,6 @@
 package lab03.util;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +12,8 @@ public class GerenciadorDeResultados {
 	private int numTotalArquivos;
 	private boolean modificada;
 	private static GerenciadorDeResultados currentInstance;
+	private long initTime;
+	private long endTime;
 
 	private GerenciadorDeResultados() {
 
@@ -18,8 +21,8 @@ public class GerenciadorDeResultados {
 		arquivosPesquisados = 0;
 		numTotalArquivos = 0;
 		modificada = false;
+		initTime = Calendar.getInstance().getTimeInMillis();
 	}
-
 	public Map<String, Integer> getResultado() {
 		synchronized (resultado) {
 
@@ -37,6 +40,8 @@ public class GerenciadorDeResultados {
 			MergeResultado(parcial);
 			arquivosPesquisados++;
 			modificada = true;
+			endTime = Calendar.getInstance().getTimeInMillis();
+
 		}
 	}
 
@@ -72,6 +77,10 @@ public class GerenciadorDeResultados {
 
 	public synchronized void addArquivo() {
 		numTotalArquivos++;
+	}
+	
+	public long getTempoDecorrido(){
+		return endTime - initTime;
 	}
 
 }
